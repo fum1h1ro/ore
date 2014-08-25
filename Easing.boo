@@ -1,6 +1,8 @@
 ﻿namespace ore
 import UnityEngine
 
+// hogehoge
+
 /*
    TERMS OF USE - EASING EQUATIONS
    ---------------------------------------------------------------------------------
