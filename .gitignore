@@ -1,0 +1,11 @@
+client/Temp
+client/Library
+.*
+!.gitignore
+client/*.booproj
+client/*.csproj
+client/*.sln
+client/unity.userprefs
+Thumbs.db
+Thumbs.db.meta
+build
