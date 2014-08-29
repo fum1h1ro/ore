@@ -11,7 +11,7 @@ public class AppTime (MonoBehaviour):
   _deltaTime as (single)
   _fadeScale as (single)
   _fadeSpeed as (single)
-  static public def GetIndex(name as string):
+  static public def GetLayerIndex(name as string):
     return System.Array.IndexOf(_instance._layers, name)
   static public timeScale:
     get:
@@ -21,9 +21,13 @@ public class AppTime (MonoBehaviour):
       return _instance._deltaTime
   static public def SetScale(layer as uint, sca as single):
     _instance._timeScale[layer] = sca
+  static public def SetScale(name as string, sca as single):
+    SetScale(GetLayerIndex(name), sca)
   static public def SetScaleWithFade(layer as uint, sca as single, time as single):
     _instance._fadeScale[layer] = sca
     _instance._fadeSpeed[layer] = Mathf.Abs(_instance._fadeScale[layer] - _instance._timeScale[layer]) / time
+  static public def SetScaleWithFade(name as string, sca as single, time as single):
+    SetScaleWithFade(GetLayerIndex(name), sca, time)
   static public def ResetScale():
     for i in range(_instance._layers.Length):
       _instance._timeScale[i] = 1.0f

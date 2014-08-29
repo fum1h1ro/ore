@@ -65,7 +65,56 @@ static public def FindChild(obj as GameObject, suffix as string) as GameObject:
   return null
 
 
-
+[System.Reflection.DefaultMember("h")]
+public class UnorderedArray [of T(class)] ():
+  _table as (T)
+  _size = 0
+  _insertPos = 0
+  size:
+    get:
+      return _size
+  h(index as int):
+    get:
+      rawArrayIndexing:
+        return _table[index]
+    set:
+      rawArrayIndexing:
+        _table[index] = value
+  def constructor():
+    Reserve(4)
+  def constructor(sz as int):
+    Reserve(sz)
+  def Clear():
+    for i in range(_table.Length):
+      _table[i] = null
+    _insertPos = 0
+  def Reserve(sz as int):
+    if _size < sz:
+      _size = sz
+    if _table == null:
+      _table = array(typeof(T), _size)
+    else:
+      System.Array.Resize[of T](_table, _size)
+  def Add(v as T):
+    if _insertPos >= _size or _table[_insertPos] == null:
+      for i in range(_table.Length):
+        if _table[i] == null:
+          _table[i] = v
+          _insertPos = i+1
+          break
+      then:
+        Reserve(_size * 2)
+        Add(v)
+    else:
+      _table[_insertPos++] = v
+  def IndexOf(v as T):
+    return System.Array.IndexOf(_table, v)
+  def CopyTo(dst as UnorderedArray[of T]):
+    if dst.size < size:
+      dst.Reserve(size)
+    dst.Clear()
+    for i in range(_table.Length):
+      dst[i] = _table[i]
 
 public class Math:
   static public def Loop(n as int, lo as int, hi as int) as int:
