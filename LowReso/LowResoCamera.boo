@@ -19,6 +19,7 @@ class LowResoCamera (MonoBehaviour):
   _colors as (Color)
   _uvs as (Vector2)
   _indices as (int)
+  _support as LowResoCameraSupport
 
   def Awake():
     _camera = camera
@@ -38,13 +39,18 @@ class LowResoCamera (MonoBehaviour):
 
 
   def override_main():
+    _support = _mainCamera.gameObject.AddComponent[of LowResoCameraSupport]()
+    _support.width = _width
+    _support.height = _height
     _mainCamera.targetTexture = _renderTexture
     _camera.enabled = true
-    rc = _mainCamera.pixelRect
-    rc.width = _width
-    rc.height = _height
-    _mainCamera.pixelRect = rc
-    Debug.Log(_mainCamera.pixelRect)
+
+
+    //rc = _mainCamera.pixelRect
+    //rc.width = _width
+    //rc.height = _height
+    //_mainCamera.pixelRect = rc
+    //Debug.Log(_mainCamera.pixelRect)
 
   def create_buffer():
     _widthPow2 = Mathf.NextPowerOfTwo(_width)

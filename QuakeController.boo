@@ -2,6 +2,7 @@
 import UnityEngine
 
 class QuakeController (MonoBehaviour):
+  _transform as Transform
   _width as Vector2
   _count as Vector2
   _tick as single
@@ -10,6 +11,7 @@ class QuakeController (MonoBehaviour):
   _backup as Vector3
   //
   def Awake():
+    _transform = transform
     _width.Set(0.0f, 0.0f)
   // Use this for initialization
   def Start():
@@ -17,15 +19,16 @@ class QuakeController (MonoBehaviour):
   // Update is called once per frame
   def Update():
     if _time > 0.0f:
-      ProcessQuake()
+      process_quake()
+  static ii = 0
   def OnPreRender():
-    pos = _backup = transform.localPosition
-    pos += transform.up * _offset.y
-    pos += transform.right * _offset.x
-    transform.localPosition = pos
+    pos = _backup = _transform.localPosition
+    pos += _transform.up * _offset.y
+    pos += _transform.right * _offset.x
+    _transform.localPosition = pos
   def OnPostRender():
-    transform.localPosition = _backup
-  def ProcessQuake():
+    _transform.localPosition = _backup
+  def process_quake():
     t = Mathf.Min(_tick / _time, 1.0f)
     wx = util.Math.EaseOut(_width.x, 0.0f, t)
     wy = util.Math.EaseOut(_width.y, 0.0f, t)
@@ -36,33 +39,36 @@ class QuakeController (MonoBehaviour):
       _time = 0.0f
     else:
       _tick += Time.deltaTime
-  internal def Start(x as single, y as single, cx as single, cy as single, time as single):
+  def Start(x as single, y as single, cx as single, cy as single, time as single):
     _width.Set(x, y)
     _count.Set(cx, cy)
     _time = time
     _tick = 0.0f
-  internal isQuaking:
+  def Cancel():
+    _time = 0.0f
+    _offset.Set(0.0f, 0.0f, 0.0f)
+  isQuaking:
     get:
       return _time > 0.0f
-  internal isFinished:
+  isFinished:
     get:
       return not isQuaking
 
 
-static class Quaker ():
-  _instance as QuakeController = null
-  def instance():
-    if _instance == null:
-      obj = Object.FindObjectOfType(typeof(QuakeController))
-      if obj != null:
-        _instance = obj as QuakeController
-    return _instance
-  public def Start(x as single, y as single, cx as single, cy as single, time as single):
-    instance().Start(x, y, cx, cy, time)
-  public isQuaking:
-    get:
-      return instance().isQuaking
-  public isFinished:
-    get:
-      return instance().isFinished
+//static class Quaker ():
+//  _instance as QuakeController = null
+//  def instance():
+//    if _instance == null:
+//      obj = Object.FindObjectOfType(typeof(QuakeController))
+//      if obj != null:
+//        _instance = obj as QuakeController
+//    return _instance
+//  public def Start(x as single, y as single, cx as single, cy as single, time as single):
+//    instance().Start(x, y, cx, cy, time)
+//  public isQuaking:
+//    get:
+//      return instance().isQuaking
+//  public isFinished:
+//    get:
+//      return instance().isFinished
 
