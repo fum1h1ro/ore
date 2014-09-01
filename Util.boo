@@ -73,7 +73,7 @@ public class UnorderedArray [of T(class)] ():
   size:
     get:
       return _size
-  h(index as int):
+  h[index as int]:
     get:
       rawArrayIndexing:
         return _table[index]
