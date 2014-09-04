@@ -95,7 +95,7 @@ public class UnorderedArray [of T(class)] ():
       _table = array(typeof(T), _size)
     else:
       System.Array.Resize[of T](_table, _size)
-  def Add(v as T):
+  def Jam(v as T):
     if _insertPos >= _size or _table[_insertPos] == null:
       for i in range(_table.Length):
         if _table[i] == null:
@@ -104,9 +104,12 @@ public class UnorderedArray [of T(class)] ():
           break
       then:
         Reserve(_size * 2)
-        Add(v)
+        Jam(v)
     else:
       _table[_insertPos++] = v
+  def Erase(v as T):
+    idx = IndexOf(v)
+    _table[idx] = null if idx >= 0
   def IndexOf(v as T):
     return System.Array.IndexOf(_table, v)
   def CopyTo(dst as UnorderedArray[of T]):

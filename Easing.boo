@@ -42,60 +42,60 @@ public static class Easing ():
      Linear
      ---------------------------------------------------------------------------------
    */
-  public def easeLinear(t as single, b as single, c as single, d as single) as single:
+  public def Linear(t as single, b as single, c as single, d as single) as single:
     return c * t / d + b
   /*
      Sine
      ---------------------------------------------------------------------------------
    */
-  public def easeInSine(t as single, b as single, c as single, d as single) as single:
+  public def InSine(t as single, b as single, c as single, d as single) as single:
     return -c * Mathf.Cos(t / d * PI_D2) + c + b
-  public def easeOutSine(t as single, b as single, c as single, d as single) as single:
+  public def OutSine(t as single, b as single, c as single, d as single) as single:
     return c * Mathf.Sin(t / d * PI_D2) + b
-  public def easeInOutSine(t as single, b as single, c as single, d as single) as single:
+  public def InOutSine(t as single, b as single, c as single, d as single) as single:
     return -c / 2.0f * (Mathf.Cos(Mathf.PI * t / d) - 1.0f) + b
   /*
      Quintic
      ---------------------------------------------------------------------------------
    */
-  public def easeInQuint(t as single, b as single, c as single, d as single) as single:
+  public def InQuint(t as single, b as single, c as single, d as single) as single:
     return c * (t /= d) * t * t * t * t + b
-  public def easeOutQuint(t as single, b as single, c as single, d as single) as single:
+  public def OutQuint(t as single, b as single, c as single, d as single) as single:
     return c *((t = t / d - 1.0f) * t * t * t * t + 1.0f) + b
-  public def easeInOutQuint(t as single, b as single, c as single, d as single) as single:
+  public def InOutQuint(t as single, b as single, c as single, d as single) as single:
     return c / 2 * t * t * t * t * t + b if (t /= d / 2) < 1.0f
     return c / 2 * ((t -= 2) * t * t * t * t + 2) + b
   /*
      Quartic
      ---------------------------------------------------------------------------------
    */
-  public def easeInQuart (t as single, b as single, c as single, d as single) as single:
+  public def InQuart (t as single, b as single, c as single, d as single) as single:
     return c * (t /= d) * t * t * t + b
-  public def easeOutQuart (t as single, b as single, c as single, d as single) as single:
+  public def OutQuart (t as single, b as single, c as single, d as single) as single:
     return -c * ((t = t / d - 1.0f) * t * t * t - 1.0f) + b
-  public def easeInOutQuart (t as single, b as single, c as single, d as single) as single:
+  public def InOutQuart (t as single, b as single, c as single, d as single) as single:
     return c / 2 * t * t * t * t + b if (t /= d / 2) < 1.0f
     return -c / 2 * ((t -= 2) * t * t * t - 2) + b
   /*
      Quadratic
      ---------------------------------------------------------------------------------
    */
-  public def easeInQuad (t as single, b as single, c as single, d as single) as single:
+  public def InQuad (t as single, b as single, c as single, d as single) as single:
     return c * (t /= d) * t + b
-  public def easeOutQuad (t as single, b as single, c as single, d as single) as single:
+  public def OutQuad (t as single, b as single, c as single, d as single) as single:
     return -c * (t /= d) * (t - 2) + b
-  public def easeInOutQuad (t as single, b as single, c as single, d as single) as single:
+  public def InOutQuad (t as single, b as single, c as single, d as single) as single:
     return c / 2 * t * t + b if (t /= d / 2) < 1.0f
     return -c / 2 * ((--t) * (t - 2) - 1.0f) + b
   /*
      Exponential
      ---------------------------------------------------------------------------------
    */
-  public def easeInExpo (t as single, b as single, c as single, d as single) as single:
+  public def InExpo (t as single, b as single, c as single, d as single) as single:
     return (b if t == 0 else c * Mathf.Pow(2, 10 * (t / d - 1.0f)) + b)
-  public def easeOutExpo (t as single, b as single, c as single, d as single) as single:
+  public def OutExpo (t as single, b as single, c as single, d as single) as single:
     return (b + c if t == d else c * (-Mathf.Pow(2, -10 * t / d) + 1.0f) + b)
-  public def easeInOutExpo (t as single, b as single, c as single, d as single) as single:
+  public def InOutExpo (t as single, b as single, c as single, d as single) as single:
     return b if (t == 0)
     return b + c if (t == d)
     return c / 2 * Mathf.Pow(2, 10 * (t - 1.0f)) + b if ((t /= d / 2) < 1.0f)
@@ -105,43 +105,53 @@ public static class Easing ():
      Elastic
      ---------------------------------------------------------------------------------
    */
-  /*
-  public def easeInElastic (t as single, b as single, c as single, d as single, a as single=undefined, p as single=undefined) as single:
-    s as single;
+  public def InElastic(t as single, b as single, c as single, d as single, a as single, p as single) as single:
+    s as single
     return b if t==0
     return b+c if (t /= d)==1.0f
-    p=d*.3 if not p
-    if (!a || a < Mathf.abs(c)) { a=c; s=p/4; }
-    else s = p/PI_M2 * Mathf.asin (c/a);
-    return -(a*Mathf.Pow(2,10*(t-=1.0f)) * Mathf.sin( (t*d-s)*PI_M2/p )) + b;
-  }
-  public def easeOutElastic (t as single, b as single, c as single, d as single, a as single=undefined, p as single=undefined) as single:
-  {
-    var s as single;
-    if (t==0) return b;  if ((t/=d)==1.0f) return b+c;  if (!p) p=d*.3;
-    if (!a || a < Mathf.abs(c)) { a=c; s=p/4; }
-    else s = p/PI_M2 * Mathf.asin (c/a);
-    return (a*Mathf.Pow(2,-10*t) * Mathf.sin( (t*d-s)*PI_M2/p ) + c + b);
-  }
-  public def easeInOutElastic (t as single, b as single, c as single, d as single, a as single=undefined, p as single=undefined) as single:
-  {
-    var s as single;
-    if (t==0) return b;  if ((t/=d/2)==2) return b+c;  if (!p) p=d*(.3*1.5);
-    if (!a || a < Mathf.abs(c)) { a=c; s=p/4; }
-    else s = p/PI_M2 * Mathf.asin (c/a);
-    if (t < 1.0f) return -.5*(a*Mathf.Pow(2,10*(t-=1)) * Mathf.sin( (t*d-s)*PI_M2/p )) + b;
-    return a*Mathf.Pow(2,-10*(t-=1.0f)) * Mathf.sin( (t*d-s)*PI_M2/p )*.5 + c + b;
-  }
-  */
+    //p=d*.3 if not p
+    if a < Mathf.Abs(c):
+      a=c
+      s=p/4
+    else:
+      s = p/PI_M2 * Mathf.Asin(c/a)
+    return -(a*Mathf.Pow(2,10*(t-=1.0f)) * Mathf.Sin( (t*d-s)*PI_M2/p )) + b
+  public def OutElastic(t as single, b as single, c as single, d as single) as single:
+    return OutElastic(t, b, c, d, c, d * 0.3f)
+  public def OutElastic(t as single, b as single, c as single, d as single, a as single, p as single) as single:
+    s as single
+    return b if t == 0.0f
+    return b+c if (t /= d) == 1.0f
+    //if (!p) p=d*.3;
+    if a < Mathf.Abs(c):
+      a = c
+      s = p * 0.25f
+    else:
+      s = p / PI_M2 * Mathf.Asin(c / a)
+    return (a * Mathf.Pow(2.0f, -10.0f * t) * Mathf.Sin((t * d - s) * PI_M2 / p) + c + b)
+  public def InOutElastic(t as single, b as single, c as single, d as single) as single:
+    return InOutElastic(t, b, c, d, c, d * (0.3f * 1.5f))
+  public def InOutElastic(t as single, b as single, c as single, d as single, a as single, p as single) as single:
+    s as single
+    return b if t==0
+    return b+c if (t /= d/2)==2.0f
+    //if (!p) p=d*(.3*1.5);
+    if a < Mathf.Abs(c):
+      a=c
+      s=p/4
+    else:
+      s = p/PI_M2 * Mathf.Asin(c/a)
+    return -.5f*(a*Mathf.Pow(2,10*(t-=1)) * Mathf.Sin( (t*d-s)*PI_M2/p )) + b if t < 1.0f
+    return a*Mathf.Pow(2,-10*(t-=1.0f)) * Mathf.Sin( (t*d-s)*PI_M2/p )*.5f + c + b
   /*
      Circular
      ---------------------------------------------------------------------------------
    */
-  public def easeInCircular(t as single, b as single, c as single, d as single) as single:
+  public def InCircular(t as single, b as single, c as single, d as single) as single:
     return -c * (Mathf.Sqrt(1.0f - (t /= d) * t) - 1.0f) + b
-  public def easeOutCircular(t as single, b as single, c as single, d as single) as single:
+  public def OutCircular(t as single, b as single, c as single, d as single) as single:
     return c * Mathf.Sqrt(1.0f - (t = t / d - 1.0f) * t) + b
-  public def easeInOutCircular(t as single, b as single, c as single, d as single) as single:
+  public def InOutCircular(t as single, b as single, c as single, d as single) as single:
     return -c / 2 * (Mathf.Sqrt(1.0f - t * t) - 1.0f) + b if (t /= d / 2) < 1.0f
     return c / 2 * (Mathf.Sqrt(1.0f - (t -= 2) * t) + 1.0f) + b
 
@@ -149,26 +159,26 @@ public static class Easing ():
      Back
      ---------------------------------------------------------------------------------
    */
-  public def easeInBack(t as single, b as single, c as single, d as single) as single:
-    return easeInBack(t, b, c, d, 1.70158f)
-  public def easeInBack(t as single, b as single, c as single, d as single, s as single) as single:
+  public def InBack(t as single, b as single, c as single, d as single) as single:
+    return InBack(t, b, c, d, 1.70158f)
+  public def InBack(t as single, b as single, c as single, d as single, s as single) as single:
     return c * (t /= d) * t * ((s + 1) * t - s) + b
-  public def easeOutBack(t as single, b as single, c as single, d as single) as single:
-    return easeOutBack(t, b, c, d, 1.70158f)
-  public def easeOutBack(t as single, b as single, c as single, d as single, s as single) as single:
+  public def OutBack(t as single, b as single, c as single, d as single) as single:
+    return OutBack(t, b, c, d, 1.70158f)
+  public def OutBack(t as single, b as single, c as single, d as single, s as single) as single:
     return c * ((t = t / d - 1.0f) * t * ((s + 1.0f) * t + s) + 1.0f) + b
-  public def easeInOutBack(t as single, b as single, c as single, d as single) as single:
-    return easeInOutBack(t, b, c, d, 1.70158f)
-  public def easeInOutBack(t as single, b as single, c as single, d as single, s as single) as single:
+  public def InOutBack(t as single, b as single, c as single, d as single) as single:
+    return InOutBack(t, b, c, d, 1.70158f)
+  public def InOutBack(t as single, b as single, c as single, d as single, s as single) as single:
     return c / 2 * ( t * t * (((s *= (1.525f)) + 1) * t - s)) + b if (t /= d / 2) < 1
     return c / 2 * ((t -= 2) * t * (((s *= (1.525f)) + 1) * t + s) + 2) + b
   /*
      Bounce
      ---------------------------------------------------------------------------------
    */
-  public def easeInBounce(t as single, b as single, c as single, d as single) as single:
-    return c - easeOutBounce(d - t, 0.0f, c, d) + b
-  public def easeOutBounce(t as single, b as single, c as single, d as single) as single:
+  public def InBounce(t as single, b as single, c as single, d as single) as single:
+    return c - OutBounce(d - t, 0.0f, c, d) + b
+  public def OutBounce(t as single, b as single, c as single, d as single) as single:
     if (t /= d) < (1.0f / 2.75f):
       return c * (7.5625f * t * t) + b
     elif t < (2.0f / 2.75f):
@@ -177,19 +187,19 @@ public static class Easing ():
       return c * (7.5625f * (t -= (2.25f /2.75f)) * t + 0.9375f) + b
     else:
       return c * (7.5625f * (t -= (2.625f / 2.75f)) * t + 0.984375f) + b
-  public def easeInOutBounce(t as single, b as single, c as single, d as single) as single:
+  public def InOutBounce(t as single, b as single, c as single, d as single) as single:
     if t < d / 2.0f:
-      return easeInBounce(t * 2.0f, 0.0f, c, d) * .5f + b
+      return InBounce(t * 2.0f, 0.0f, c, d) * .5f + b
     else:
-      return easeOutBounce(t * 2.0f - d, 0.0f, c, d) * .5f + c * .5f + b
+      return OutBounce(t * 2.0f - d, 0.0f, c, d) * .5f + c * .5f + b
   /*
      Cubic
      ---------------------------------------------------------------------------------
    */
-  public def easeInCubic(t as single, b as single, c as single, d as single) as single:
+  public def InCubic(t as single, b as single, c as single, d as single) as single:
     return c * (t /= d) * t * t + b
-  public def easeOutCubic(t as single, b as single, c as single, d as single) as single:
+  public def OutCubic(t as single, b as single, c as single, d as single) as single:
     return c * ((t = t / d - 1) * t * t + 1) + b
-  public def easeInOutCubic(t as single, b as single, c as single, d as single) as single:
+  public def InOutCubic(t as single, b as single, c as single, d as single) as single:
     return c / 2.0f * t * t * t + b if (t /= d / 2.0f) < 1.0f
     return c / 2.0f * ((t -= 2.0f) * t * t + 2.0f) + b
