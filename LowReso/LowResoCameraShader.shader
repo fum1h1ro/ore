@@ -1,4 +1,4 @@
-﻿Shader "ore/LowResoShader" {
+﻿Shader "ore/LowResoCameraShader" {
     /*
         Only on orthographics
      */
@@ -39,10 +39,10 @@ struct v2f {
 v2f vert(a2v v) {
     v2f o;
     o.position = mul(UNITY_MATRIX_MVP, v.vertex);
-    o.position.xy *= _ScreenParams.xy;
-    o.position.x = (int)o.position.x;
-    o.position.y = (int)o.position.y;
-    o.position.xy /= _ScreenParams.xy;
+    //o.position.xy *= _ScreenParams.xy;
+    //o.position.x = (int)o.position.x;
+    //o.position.y = (int)o.position.y;
+    //o.position.xy /= _ScreenParams.xy;
     o.color = v.color;
     o.uv = TRANSFORM_TEX(v.uv, _MainTex);
     return o;
@@ -50,9 +50,9 @@ v2f vert(a2v v) {
 
 fixed4 frag(v2f i) : COLOR {
     half4 col = i.color * tex2D(_MainTex, i.uv);
-    col *= 16.0;
+    col *= 8.0;
     col = floor(col);
-    col *= 1.0/16.0;
+    col *= 1.0/8.0;
     col.w = 1;
     return col;//i.color * tex2D(_MainTex, i.uv);
 }

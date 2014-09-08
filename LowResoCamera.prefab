@@ -73,7 +73,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mainCamera: {fileID: 0}
-  _shader: {fileID: 10752, guid: 0000000000000000f000000000000000, type: 0}
+  _shader: {fileID: 4800000, guid: 4ea5e796255884ea2bbad077bab7dffd, type: 3}
   _width: 160
   _height: 284
 --- !u!1001 &100100000
