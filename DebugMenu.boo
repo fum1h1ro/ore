@@ -24,8 +24,6 @@ class DebugMenu (MonoBehaviour):
   _connected = false
   _confirmString as (string)
   _confirmFunction as (callable)
-  _requestFile = List[of string]()
-  _loadedFile = Dictionary[of string, (byte)]()
   static final kRETINA_W = 640.0f
   static final kRETINA_H = 1136.0f
   static final kBUTTON_SIZE = 96.0f
@@ -83,19 +81,14 @@ class DebugMenu (MonoBehaviour):
   isWakeup:
     get:
       return _state != state_button
+  static public instance:
+    get:
+      return _instance
   static public isAlive:
     get:
       return _instance != null
   static public def Wakeup():
     _instance.stateNext = _instance.state_wakeup
-  static public def Load(filename as string):
-    _instance._requestFile.Add(filename)
-  static public def Unload(filename as string):
-    _instance._loadedFile.Remove(filename)
-  static public def IsLoaded(filename as string):
-    return _instance._loadedFile.ContainsKey(filename)
-  static public def GetFile(filename as string):
-    return _instance._loadedFile[filename]
   // タブ
   public abstract class Tab ():
     _menu as DebugMenu
@@ -150,6 +143,7 @@ class DebugMenu (MonoBehaviour):
       windowTitle = "DEBUG MENU"
       //DontDestroyOnLoad(gameObject)
       default_tabs()
+      StartCoroutine(proc_server())
     else:
       Destroy(gameObject);
   def OnDestroy():
@@ -370,20 +364,6 @@ class DebugMenu (MonoBehaviour):
       else:
         _connected = false
       yield WaitForSeconds(3)
-  def proc_loader() as IEnumerator:
-    while true:
-      if _connected:
-        if _requestFile.Count > 0:
-          filename = _requestFile[0]
-          _requestFile.RemoveAt(0)
-          util.Log("LOADFILE: ${filename}")
-          www = WWW("http://192.168.0.${_addr}:${PORT}/${filename}")
-          yield www
-          if string.IsNullOrEmpty(www.error):
-            _loadedFile[filename] = www.bytes
-          else:
-            util.Log(www.error)
-      yield WaitForSeconds(1)
   /*
   private Stream CreatePersistentDataStream(FileMode mode) {
       Stream stream = new FileStream(Application.persistentDataPath + "/debugmenu.bin", mode);
@@ -444,8 +424,6 @@ class DebugMenu (MonoBehaviour):
   public class ServerTab (Tab):
     def constructor(n as string):
       super(n)
-    public override def Init():
-      _menu.StartCoroutine(_menu.proc_server())
     public override def Execute():
       GUILayout.Label("STATUS: ${('CONNECTED' if _menu.connected else 'DISCONNECTED')}")
       GUILayout.Label("IP ADDRESS: ${_menu.addr}")
