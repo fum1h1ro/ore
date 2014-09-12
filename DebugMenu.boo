@@ -24,6 +24,8 @@ class DebugMenu (MonoBehaviour):
   _connected = false
   _confirmString as (string)
   _confirmFunction as (callable)
+  _requestFile = List[of string]()
+  _loadedFile = Dictionary[of string, (byte)]()
   static final kRETINA_W = 640.0f
   static final kRETINA_H = 1136.0f
   static final kBUTTON_SIZE = 96.0f
@@ -86,6 +88,14 @@ class DebugMenu (MonoBehaviour):
       return _instance != null
   static public def Wakeup():
     _instance.stateNext = _instance.state_wakeup
+  static public def Load(filename as string):
+    _instance._requestFile.Add(filename)
+  static public def Unload(filename as string):
+    _instance._loadedFile.Remove(filename)
+  static public def IsLoaded(filename as string):
+    return _instance._loadedFile.ContainsKey(filename)
+  static public def GetFile(filename as string):
+    return _instance._loadedFile[filename]
   // タブ
   public abstract class Tab ():
     _menu as DebugMenu
@@ -185,6 +195,11 @@ class DebugMenu (MonoBehaviour):
     _confirmString[1] = (rstr if rstr != null else 'OK')
     _confirmFunction[0] = lfunc
     _confirmFunction[1] = rfunc
+
+
+
+
+
   def OnGUI():
     make_style()
     if _stateNext != null:
@@ -354,6 +369,20 @@ class DebugMenu (MonoBehaviour):
             _connected = true
       else:
         _connected = false
+      yield WaitForSeconds(3)
+  def proc_loader() as IEnumerator:
+    while true:
+      if _connected:
+        if _requestFile.Count > 0:
+          filename = _requestFile[0]
+          _requestFile.RemoveAt(0)
+          util.Log("LOADFILE: ${filename}")
+          www = WWW("http://192.168.0.${_addr}:${PORT}/${filename}")
+          yield www
+          if string.IsNullOrEmpty(www.error):
+            _loadedFile[filename] = www.bytes
+          else:
+            util.Log(www.error)
       yield WaitForSeconds(1)
   /*
   private Stream CreatePersistentDataStream(FileMode mode) {
