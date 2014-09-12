@@ -102,7 +102,7 @@ class App (MonoBehaviour):
           ifdef UNITY_EDITOR:
             www = WWW("http://127.0.0.1:${DebugMenu.PORT}/${filename}")
           ifdef not UNITY_EDITOR:
-            www = WWW("http://192.168.0.${_addr}:${DebugMenu.PORT}/${filename}")
+            www = WWW("http://192.168.0.${DebugMenu.instance.addr}:${DebugMenu.PORT}/${filename}")
         else:
           www = WWW("file://${Application.streamingAssetsPath}/${filename}")
         yield www
