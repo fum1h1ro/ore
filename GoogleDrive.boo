@@ -4,6 +4,9 @@ import UnityEngine
 //
 class Spreadsheet ():
   _worksheets = Dictionary[of string, Worksheet]()
+  worksheets:
+    get:
+      return _worksheets
   //
   def constructor():
     pass

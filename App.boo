@@ -11,6 +11,8 @@ class App (MonoBehaviour):
     _timer = 0.0f
     def constructor(n as string):
       _name = n
+    def App[of T]():
+      return _app as T
     app:
       get:
         return _app
