@@ -5,6 +5,7 @@
         _PixelDepth ("Pixel Depth", 2D) = "white" {}
         _NormalColor ("Normal Color", 2D) = "white" {}
         _NormalDepth ("Normal Depth", 2D) = "white" {}
+        _Grid ("Grid", Vector) = (4, 4, 1, 1)
     }
     SubShader {
         Tags {
@@ -31,6 +32,7 @@ half4 _PixelColor_ST;
 half4 _PixelDepth_ST;
 half4 _NormalColor_ST;
 half4 _NormalDepth_ST;
+half4 _Grid;
 
 struct a2v {
     float4 vertex : POSITION;
@@ -64,7 +66,14 @@ fixed4 frag(v2f i) : COLOR {
         pc *= _ColorReductionLevel.x;
         pc = floor(pc + 0.5);
         pc *= _ColorReductionLevel.y;
-        return pc;
+        int u = i.uv.x * _ScreenParams.x;
+        int v = i.uv.y * _ScreenParams.y;
+
+        if (u % (int)_Grid.x == 0 || v % (int)_Grid.y == 0) {
+            return pc * 0.5f;
+        } else {
+            return pc * 1.5f;
+        }
     }
     return tex2D(_NormalColor, i.uv2);// * 0.5f;
 }

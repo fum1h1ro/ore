@@ -63,7 +63,7 @@ class App (MonoBehaviour):
     ifdef not UNITY_EDITOR:
       QualitySettings.vSyncCount = 1
       Application.targetFrameRate = 60
-      TLog.Output('START')
+      //TLog.Output('START')
     StartCoroutine(proc_loader())
   //
   def OnDestroy():
