@@ -19,11 +19,11 @@ class App (MonoBehaviour):
       internal set:
         _app = value
     internal def _initialize():
-      TLog.Output("${_name}.Initialize")
+      //TLog.Output("${_name}.Initialize")
       Initialize()
     internal def _finalize():
       Finalize()
-      TLog.Output("${_name}.Finalize")
+      //TLog.Output("${_name}.Finalize")
     internal def _update():
       Update()
     virtual def Initialize():
