@@ -8,6 +8,7 @@ import System.Runtime.Serialization.Formatters.Binary
 //namespace 
 // デバッグメニュー基底
 class DebugMenu (MonoBehaviour):
+  public static final PORT = 6456
   static _instance as DebugMenu = null
   _silentMode as bool = false
   _buttonRect as Rect
@@ -19,6 +20,10 @@ class DebugMenu (MonoBehaviour):
   _buttonStyle as GUIStyle = null
   _delegatefunction as GUI.WindowFunction
   _windowTitle as string
+  _addr = 0
+  _connected = false
+  _confirmString as (string)
+  _confirmFunction as (callable)
   static final kRETINA_W = 640.0f
   static final kRETINA_H = 1136.0f
   static final kBUTTON_SIZE = 96.0f
@@ -34,6 +39,7 @@ class DebugMenu (MonoBehaviour):
   _selectTab = -1
   _bakScale = 1.0f
   //
+  public _permanent = false
   public _valueStyleFG as Color = Color(1, 1, 1, 1)
   public _valueStyleBG as Texture2D
   //
@@ -62,9 +68,22 @@ class DebugMenu (MonoBehaviour):
       return _windowTitle
     set:
       _windowTitle = value
+  addr:
+    get:
+      return _addr
+    set:
+      _addr = value
+  connected:
+    get:
+      return _connected
+    set:
+      _connected = value
   isWakeup:
     get:
       return _state != state_button
+  static public instance:
+    get:
+      return _instance
   static public isAlive:
     get:
       return _instance != null
@@ -109,6 +128,8 @@ class DebugMenu (MonoBehaviour):
       GUILayout.Label(name)
   //
   def Awake():
+    if _permanent:
+      DontDestroyOnLoad(gameObject)
     if Debug.isDebugBuild and _instance == null:
       _instance = self
       w = Screen.width / 15.0f
@@ -122,6 +143,7 @@ class DebugMenu (MonoBehaviour):
       windowTitle = "DEBUG MENU"
       //DontDestroyOnLoad(gameObject)
       default_tabs()
+      StartCoroutine(proc_server())
     else:
       Destroy(gameObject);
   def OnDestroy():
@@ -130,8 +152,7 @@ class DebugMenu (MonoBehaviour):
   def Start():
     util.Log("super.Start()")
   def default_tabs():
-    ifdef UNITY_EDITOR:
-      AddTab(LogTab("LOG"))
+    AddTab(LogTab("LOG"))
     AddTab(ServerTab("SERVER"))
     AddTab(SystemTab("SYS"))
   def AddTab(t as Tab):
@@ -158,9 +179,21 @@ class DebugMenu (MonoBehaviour):
         _tabs[oldtab].Stop() if oldtab >= 0
         _tabs[_selectTab].Start() if _selectTab >= 0
       _tabs[_selectTab].Execute()
-  def shutdown():
+  def Shutdown():
     stateNext = state_shutdown
-    
+  def Confirm(lstr as string, lfunc as callable, rstr as string, rfunc as callable):
+    stateNext = state_confirm
+    _confirmString = array(string, 2)
+    _confirmFunction = array(typeof(callable), 2)
+    _confirmString[0] = (lstr if lstr != null else 'CANCEL')
+    _confirmString[1] = (rstr if rstr != null else 'OK')
+    _confirmFunction[0] = lfunc
+    _confirmFunction[1] = rfunc
+
+
+
+
+
   def OnGUI():
     make_style()
     if _stateNext != null:
@@ -192,7 +225,7 @@ class DebugMenu (MonoBehaviour):
         _buttonRect.x = e.mousePosition.x - _buttonRect.width * 0.5f
         _buttonRect.y = e.mousePosition.y - _buttonRect.height * 0.5f
         if e.type == EventType.MouseUp:
-          _touched = 0.0f;
+          _touched = 0.0f
       if e.isMouse:
         e.Use()
     LimitRect()
@@ -223,9 +256,20 @@ class DebugMenu (MonoBehaviour):
   def state_delegate():
     e = Event.current
     if e.type == EventType.MouseDown and not _menuRect.Contains(e.mousePosition):
-      shutdown()
+      Shutdown()
       e.Use()
     _menuRect = GUI.Window(0, _menuRect, _delegatefunction, _windowTitle)//, _windowStyle)
+  def state_confirm():
+    buttonwidth = Screen.width / 2
+    buttonheight = Screen.height / 15
+    GUILayout.BeginHorizontal()
+    if GUILayout.Button(_confirmString[0], GUILayout.Width(buttonwidth), GUILayout.Height(buttonheight)):
+      (_confirmFunction[0])() if _confirmFunction[0] != null
+      stateNext = state_delegate
+    elif GUILayout.Button(_confirmString[1], GUILayout.Width(buttonwidth), GUILayout.Height(buttonheight)):
+      (_confirmFunction[1])() if _confirmFunction[1] != null
+      stateNext = state_delegate
+    GUILayout.EndHorizontal()
   def LerpRect(fromrc as Rect, to as Rect, t as single):
     rc = Rect(0, 0, 0, 0)
     rc.x = Mathf.Lerp(fromrc.x, to.x, t)
@@ -296,6 +340,30 @@ class DebugMenu (MonoBehaviour):
       GUILayout.EndHorizontal()
     v = int.Parse(vs)
     return Mathf.Clamp(v, lo, hi)
+  def proc_server() as IEnumerator:
+    while true:
+      //addr = 0
+      //addr = int.Parse(_ipaddr) unless string.IsNullOrEmpty(_ipaddr)
+      //Util.Log(addr)
+      if 0 < _addr and _addr < 255:
+        //Util.Log(int.Parse(_ipaddr))
+        ifdef UNITY_EDITOR:
+          www = WWW("http://127.0.0.1:${PORT}/api?ping")
+        ifdef not UNITY_EDITOR:
+          www = WWW("http://192.168.0.${_addr}:${PORT}/api?ping")
+        yield www
+        _connected = false
+        if string.IsNullOrEmpty(www.error):
+          //Util.Log(www.text)
+          //s = MessagePackSerializer.Create[of System.Collections.Generic.Dictionary[of string, string]]()
+          //h = s.Unpack(MemoryStream(www.bytes))
+          //if h['result'] == 'ok':
+          //  _connected = true
+          if www.text == 'ok':
+            _connected = true
+      else:
+        _connected = false
+      yield WaitForSeconds(3)
   /*
   private Stream CreatePersistentDataStream(FileMode mode) {
       Stream stream = new FileStream(Application.persistentDataPath + "/debugmenu.bin", mode);
@@ -334,8 +402,11 @@ class DebugMenu (MonoBehaviour):
     def constructor(n as string):
       super(n)
     public override def Execute():
-      if GUILayout.Button("RELOAD"):
-        Application.LoadLevel(Application.loadedLevelName)
+      buttonheight = Screen.height / 15
+      if GUILayout.Button("RELOAD", GUILayout.Height(buttonheight)):
+        _menu.Confirm(null, null, null, reload)
+    def reload():
+      Application.LoadLevel(Application.loadedLevelName)
   //
   public class LogTab (Tab):
     _logpos = Vector2.zero
@@ -351,39 +422,9 @@ class DebugMenu (MonoBehaviour):
       GUILayout.EndScrollView()
   //
   public class ServerTab (Tab):
-    public static final PORT = 6456
-    _addr = 0
-    _connected = false
     def constructor(n as string):
       super(n)
-    public override def Init():
-      _menu.StartCoroutine(proc_server())
     public override def Execute():
-      GUILayout.Label("STATUS: ${('CONNECTED' if _connected else 'DISCONNECTED')}")
-      GUILayout.Label("IP ADDRESS: ${_addr}")
-
-      _addr = _menu.tenkey(_addr, 0, 254)
-    def proc_server() as IEnumerator:
-      while true:
-        //addr = 0
-        //addr = int.Parse(_ipaddr) unless string.IsNullOrEmpty(_ipaddr)
-        //Util.Log(addr)
-        if 0 < _addr and _addr < 255:
-          //Util.Log(int.Parse(_ipaddr))
-          ifdef UNITY_EDITOR:
-            www = WWW("http://127.0.0.1:${PORT}/api?ping")
-          ifdef not UNITY_EDITOR:
-            www = WWW("http://192.168.0.${_addr}:${PORT}/api?ping")
-          yield www
-          _connected = false
-          if string.IsNullOrEmpty(www.error):
-            //Util.Log(www.text)
-            //s = MessagePackSerializer.Create[of System.Collections.Generic.Dictionary[of string, string]]()
-            //h = s.Unpack(MemoryStream(www.bytes))
-            //if h['result'] == 'ok':
-            //  _connected = true
-            if www.text == 'ok':
-              _connected = true
-        else:
-          _connected = false
-        yield WaitForSeconds(1)
+      GUILayout.Label("STATUS: ${('CONNECTED' if _menu.connected else 'DISCONNECTED')}")
+      GUILayout.Label("IP ADDRESS: ${_menu.addr}")
+      _menu.addr = _menu.tenkey(_menu.addr, 0, 254)
