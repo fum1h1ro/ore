@@ -12,7 +12,7 @@ class PixelizeCameraSupport (MonoBehaviour):
       _height = value
   def SetCamera(cam as PixelizeCamera):
     _camera = cam
-  def OnPreRender():
-    _camera.DelegateOnPreRender(self)
-  def OnPostRender():
-    _camera.DelegateOnPostRender(self)
+  //def OnPreRender():
+  //  _camera.DelegateOnPreRender(self)
+  //def OnPostRender():
+  //  _camera.DelegateOnPostRender(self)

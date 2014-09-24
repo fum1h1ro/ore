@@ -1,12 +1,11 @@
 ﻿Shader "ore/PixelizeCameraShader" {
-    /*
-        Only on orthographics
-     */
     Properties {
-        _PixelColor ("Base (RGB)", 2D) = "white" {}
-        _PixelDepth ("Base (RGB)", 2D) = "white" {}
-        _NormalColor ("Base (RGB)", 2D) = "white" {}
-        _NormalDepth ("Base (RGB)", 2D) = "white" {}
+        _ColorReductionLevel ("Color Reduction Level", Vector) = (1, 1, 0, 0)
+        _PixelColor ("Pixel Color", 2D) = "white" {}
+        _PixelDepth ("Pixel Depth", 2D) = "white" {}
+        _NormalColor ("Normal Color", 2D) = "white" {}
+        _NormalDepth ("Normal Depth", 2D) = "white" {}
+        _Grid ("Grid", Vector) = (4, 4, 1, 1)
     }
     SubShader {
         Tags {
@@ -28,10 +27,12 @@ sampler2D _PixelColor;
 sampler2D _PixelDepth;
 sampler2D _NormalColor;
 sampler2D _NormalDepth;
+half4 _ColorReductionLevel;
 half4 _PixelColor_ST;
 half4 _PixelDepth_ST;
 half4 _NormalColor_ST;
 half4 _NormalDepth_ST;
+half4 _Grid;
 
 struct a2v {
     float4 vertex : POSITION;
@@ -58,16 +59,23 @@ v2f vert(a2v v) {
 }
 
 fixed4 frag(v2f i) : COLOR {
-    float pd = DECODE_EYEDEPTH(tex2D(_PixelDepth, i.uv));
-    float nd = DECODE_EYEDEPTH(tex2D(_NormalDepth, i.uv2));
+    float pd = DECODE_EYEDEPTH(tex2D(_PixelDepth, i.uv).x);
+    float nd = DECODE_EYEDEPTH(tex2D(_NormalDepth, i.uv2).x);
     if (pd < nd) {
         half4 pc = tex2D(_PixelColor, i.uv);
-        pc *= 8.0;
-        pc = floor(pc);
-        pc *= 1.0/8.0;
-        return pc;
+        pc *= _ColorReductionLevel.x;
+        pc = floor(pc + 0.5);
+        pc *= _ColorReductionLevel.y;
+        int u = i.uv.x * _ScreenParams.x;
+        int v = i.uv.y * _ScreenParams.y;
+
+        if (u % (int)_Grid.x == 0 || v % (int)_Grid.y == 0) {
+            return pc * 0.5f;
+        } else {
+            return pc * 1.5f;
+        }
     }
-    return tex2D(_NormalColor, i.uv2);
+    return tex2D(_NormalColor, i.uv2);// * 0.5f;
 }
 ENDCG
         }
