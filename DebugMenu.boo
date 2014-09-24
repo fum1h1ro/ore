@@ -38,6 +38,7 @@ class DebugMenu (MonoBehaviour):
   _tabs = List[of Tab]()
   _selectTab = -1
   _bakScale = 1.0f
+  _textures = array(Texture2D, 2)
   //
   public _permanent = false
   public _valueStyleFG as Color = Color(1, 1, 1, 1)
@@ -141,13 +142,16 @@ class DebugMenu (MonoBehaviour):
       _menuRect = Rect(0, 0, Screen.width, Screen.height * 0.9f)
       _delegatefunction = DefaultDelegate
       windowTitle = "DEBUG MENU"
+      _addr = PlayerPrefs.GetInt('DebugMenu.IPADDR', 0)
       //DontDestroyOnLoad(gameObject)
+      make_textures()
       default_tabs()
       StartCoroutine(proc_server())
     else:
       Destroy(gameObject);
   def OnDestroy():
     if _instance == self:
+      PlayerPrefs.SetInt('DebugMenu.IPADDR', _addr)
       _instance = null
   def Start():
     util.Log("super.Start()")
@@ -291,6 +295,15 @@ class DebugMenu (MonoBehaviour):
     _buttonRect.y += (ny - y) * 0.07f
   def RenderButton():
     GUI.Box(_buttonRect, "DEBUG")//, _boxStyle)
+    rc = _buttonRect
+    rc.width *= 0.2f
+    rc.height *= 0.2f
+    rc.x += rc.width
+    rc.y += rc.height
+    if _connected:
+      GUI.DrawTexture(rc, _textures[1])
+    else:
+      GUI.DrawTexture(rc, _textures[0])
   def make_style():
     if _windowStyle == null:
       _windowStyle = GUIStyle()
@@ -317,6 +330,16 @@ class DebugMenu (MonoBehaviour):
     if _buttonStyle == null:
       _buttonStyle = GUIStyle('button')
       _buttonStyle.fontSize = Screen.height / 32.0f
+  def make_textures():
+    _textures[0] = create_texture(8, 8, Color.red)
+    _textures[1] = create_texture(8, 8, Color.green)
+  def create_texture(w as int, h as int, col as Color):
+    tex = Texture2D(w, h, TextureFormat.ARGB32, false, false)
+    for y in range(h):
+      for x in range(w):
+        tex.SetPixel(x, y, col)
+    tex.Apply()
+    return tex
   def tenkey(v as int, lo as int, hi as int) as int:
     buttonheight = Screen.height / 10
     buttons = (('7', '8', '9'), ('4', '5', '6'), ('1', '2', '3'), ('C', '0', '<'))
@@ -406,6 +429,7 @@ class DebugMenu (MonoBehaviour):
       if GUILayout.Button("RELOAD", GUILayout.Height(buttonheight)):
         _menu.Confirm(null, null, null, reload)
     def reload():
+      _menu.Shutdown()
       Application.LoadLevel(Application.loadedLevelName)
   //
   public class LogTab (Tab):
