@@ -364,6 +364,10 @@ class DebugMenu (MonoBehaviour):
     v = int.Parse(vs)
     return Mathf.Clamp(v, lo, hi)
   def proc_server() as IEnumerator:
+    laddr = System.Net.IPAddress.Parse(Network.player.ipAddress).ToString().Split((of char: char('.')), 4)
+    Array.Resize[of string](laddr, 3)
+    baseaddr = string.Join('.', laddr)
+    //Debug.Log("baseaddr = ${baseaddr}")
     while true:
       //addr = 0
       //addr = int.Parse(_ipaddr) unless string.IsNullOrEmpty(_ipaddr)
@@ -373,7 +377,7 @@ class DebugMenu (MonoBehaviour):
         ifdef UNITY_EDITOR:
           www = WWW("http://127.0.0.1:${PORT}/api?ping")
         ifdef not UNITY_EDITOR:
-          www = WWW("http://192.168.0.${_addr}:${PORT}/api?ping")
+          www = WWW("http://${baseaddr}.${_addr}:${PORT}/api?ping")
         yield www
         _connected = false
         if string.IsNullOrEmpty(www.error):
