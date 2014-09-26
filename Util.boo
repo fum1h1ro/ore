@@ -95,6 +95,11 @@ public class UnorderedArray [of T(class)] ():
       _table = array(typeof(T), _size)
     else:
       System.Array.Resize[of T](_table, _size)
+  def CountWithoutNull():
+    cnt = 0
+    for i in range(_table.Length):
+      cnt++ if _table[i] != null
+    return cnt
   def Jam(v as T):
     if _insertPos >= _size or _table[_insertPos] == null:
       for i in range(_table.Length):

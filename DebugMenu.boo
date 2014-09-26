@@ -165,6 +165,11 @@ class DebugMenu (MonoBehaviour):
     _tabs.Add(t)
     sort_tabs()
     t.Init()
+  def RemoveTab(ttl as string):
+    for i in range(_tabs.Count):
+      if _tabs[i].name == ttl:
+        _tabs[i] = null
+    _tabs.RemoveAll({o|o == null})
   def sort_tabs():
     _tabs.Sort({a as Tab, b as Tab|(-1 if a.sortOrder < b.sortOrder else 1)})
   def DefaultDelegate(id as int):
@@ -207,8 +212,8 @@ class DebugMenu (MonoBehaviour):
     _state()
     _first = false
   def state_button():
-    if _first:
-      util.Log("BUTTON")
+    //if _first:
+    //  //util.Log("BUTTON")
     e = Event.current
     //if (e.type != EventType.Used)
     if _touched == 0.0f:
@@ -236,7 +241,7 @@ class DebugMenu (MonoBehaviour):
     RenderButton() unless _silentMode
   def state_wakeup():
     if _first:
-      util.Log("WAKEUP")
+      //util.Log("WAKEUP")
       _interp = 0.0f
       _bakScale = AppTime.GetScale(0)
       AppTime.SetScale(0, 0.0f)
@@ -248,7 +253,7 @@ class DebugMenu (MonoBehaviour):
     //rc = GUI.Window(0, rc, DefaultDelegate, _windowTitle);
   def state_shutdown():
     if _first:
-      util.Log("SHUTDOWN")
+      //util.Log("SHUTDOWN")
       _interp = 0.0f
       AppTime.SetScale(0, _bakScale)
     rc = LerpRect(_menuRect, _buttonRect, _interp)
