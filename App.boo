@@ -43,9 +43,9 @@ class App (MonoBehaviour):
       return _stateNext
     set:
       _stateNext = value
-  instance:
-    get:
-      return _instance
+  //instance:
+  //  get:
+  //    return _instance
   static public def LoadFile(filename as string):
     _instance._requestFile.Add(filename)
   static public def UnloadFile(filename as string):

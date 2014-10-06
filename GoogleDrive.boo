@@ -87,8 +87,12 @@ class Tables (Worksheet):
     return -1
   def GetValueAsInt(name as string, idx as int) as int:
     return int.Parse(_values[name][idx])
+  def GetValueAsInt(name as string, text as string) as int:
+    return int.Parse(_values[name][FindIndex(name, text)])
   def GetValueAsSingle(name as string, idx as int) as single:
     return single.Parse(_values[name][idx])
+  def GetValueAsSingle(name as string, text as string) as single:
+    return single.Parse(_values[name][FindIndex(name, text)])
 
 
 
