@@ -1,9 +1,9 @@
 ﻿namespace ore
 import UnityEngine
 import System.Collections
-import System.IO
-import System.Runtime.Serialization
-import System.Runtime.Serialization.Formatters.Binary
+//import System.IO
+//import System.Runtime.Serialization
+//import System.Runtime.Serialization.Formatters.Binary
 
 //namespace 
 // デバッグメニュー基底
@@ -370,8 +370,8 @@ class DebugMenu (MonoBehaviour):
     return Mathf.Clamp(v, lo, hi)
   def proc_server() as IEnumerator:
     laddr = System.Net.IPAddress.Parse(Network.player.ipAddress).ToString().Split((of char: char('.')), 4)
-    Array.Resize[of string](laddr, 3)
-    baseaddr = string.Join('.', laddr)
+    System.Array.Resize[of string](laddr, 3)
+    //baseaddr = string.Join('.', laddr)
     //Debug.Log("baseaddr = ${baseaddr}")
     while true:
       //addr = 0

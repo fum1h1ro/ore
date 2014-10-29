@@ -148,7 +148,7 @@ class PixelizeCamera (MonoBehaviour):
 
   def initialize():
     _transform = transform
-    _camera = camera
+    _camera = GetComponent[of Camera]()
     create_material()
     setup_pixel_camera()
     setup_normal_camera()

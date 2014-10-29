@@ -22,7 +22,7 @@ class LowResoCamera (MonoBehaviour):
   _support as LowResoCameraSupport
 
   def Awake():
-    _camera = camera
+    _camera = GetComponent[of Camera]()
     _mainCamera = Camera.main if _mainCamera == null
     create_buffer()
     create_mesh()

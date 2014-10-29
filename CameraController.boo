@@ -63,7 +63,7 @@ class CameraController (MonoBehaviour):
       _campos.apply(Camera.main)
     initialize()
   def initialize():
-    _camera = self.camera
+    _camera = self.GetComponent[of Camera]()
     //if _campos == null:
     //  _campos = CameraPosture(Camera.main)
     for i in range(Element.Max):
